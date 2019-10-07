@@ -100,7 +100,7 @@ func StoreJoyToFile(i int, fileTitle, fileContent []string) {
 	}
 }
 
-func SpiderPage(i int) {
+func SpiderPage(i int, page chan int) {
 	//明确爬取的url
 	url := "http://www.pengfu.com/xiaohua_" + strconv.Itoa(i) + ".html"
 	fmt.Printf("正在爬取 %d个网页:%s\n", i, url)
@@ -149,13 +149,23 @@ func SpiderPage(i int) {
 	//把内容写入到文件
 	StoreJoyToFile(i, fileTitle, fileContent)
 
+	page <- i
+
 }
 
 func DoWork(start, end int) {
 
 	fmt.Printf("准备爬取第%d到%d页的网址\n", start, end)
+
+	page := make(chan int)
+
 	for i := start; i <= end; i++ {
-		SpiderPage(i)
+		//爬取主页面
+		go SpiderPage(i, page)
+	}
+
+	for i := start; i <= end; i++ {
+		fmt.Printf("第%d个页面爬取完成\n", <-page)
 	}
 
 }
