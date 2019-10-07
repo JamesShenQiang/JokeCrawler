@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -78,6 +79,27 @@ func SpiderOneJoy(url string) (title, content string, err error) {
 
 }
 
+func StoreJoyToFile(i int, fileTitle, fileContent []string) {
+	//新建文件
+	f, err := os.Create(strconv.Itoa(i) + ".txt")
+	if err != nil {
+		fmt.Println("os create err = ", err)
+		return
+	}
+	defer f.Close()
+
+	//写内存
+	n := len(fileTitle)
+	for i := 0; i < n; i++ {
+		//写标题
+		f.WriteString(fileTitle[i] + "\n")
+		//写内容
+		f.WriteString(fileContent[i] + "\n")
+
+		f.WriteString("\n=======================================\n")
+	}
+}
+
 func SpiderPage(i int) {
 	//明确爬取的url
 	url := "http://www.pengfu.com/xiaohua_" + strconv.Itoa(i) + ".html"
@@ -103,6 +125,9 @@ func SpiderPage(i int) {
 	joyUrls := re.FindAllStringSubmatch(result, -1)
 	// fmt.Println("joyUrls = ", joyUrls)
 
+	fileTitle := make([]string, 0)
+	fileContent := make([]string, 0)
+
 	//取网址
 	//第一个返回下标，第二个返回内存
 	for _, data := range joyUrls {
@@ -113,9 +138,16 @@ func SpiderPage(i int) {
 			fmt.Println("Spider one joy err = ", err)
 			continue
 		}
-		fmt.Println("title = #%v#", title)
-		fmt.Println("content = #%v#", content)
+
+		fileTitle = append(fileTitle, title)
+		fileContent = append(fileContent, content)
 	}
+
+	// fmt.Println("fileTitle = ", fileTitle)
+	// fmt.Println("fileContent = ", fileContent)
+
+	//把内容写入到文件
+	StoreJoyToFile(i, fileTitle, fileContent)
 
 }
 
