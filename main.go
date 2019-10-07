@@ -35,6 +35,44 @@ func HttpGet(url string) (result string, err error) {
 	return
 }
 
+func SpiderOneJoy(url string) (title, content string, err error) {
+	//开始爬取网页内容
+	result, err1 := HttpGet(url)
+	if err != nil {
+		err = err1
+		return
+	}
+
+	//取关键信息
+	//取标题
+	re1 := regexp.MustCompile(`<h1>(?s:(.*?))</h1>`)
+	if re1 == nil {
+		fmt.Println("regexp compile failed")
+		return
+	}
+	//取内容
+	tmpTitle := re1.FindAllStringSubmatch(result, 1) //最后参数为1，只过滤第一个
+	for _, data := range tmpTitle {
+		title = data[1]
+		break
+	}
+
+	re2 := regexp.MustCompile(`<div class="content-txt pt10">(?s:(.*?))<a id="prev" href="`)
+	if re2 == nil {
+		fmt.Println("regexp compile failed")
+		return
+	}
+	//取内容
+	tmpContent := re2.FindAllStringSubmatch(result, -1)
+	for _, data := range tmpContent {
+		content = data[1]
+		break
+	}
+
+	return
+
+}
+
 func SpiderPage(i int) {
 	//明确爬取的url
 	url := "http://www.pengfu.com/xiaohua_" + strconv.Itoa(i) + ".html"
@@ -62,7 +100,15 @@ func SpiderPage(i int) {
 	//取网址
 	//第一个返回下标，第二个返回内存
 	for _, data := range joyUrls {
-		fmt.Println("url = ", data[1])
+		// fmt.Println("url = ", data[1])
+		//爬取每一个笑话，每一个段子
+		title, content, err := SpiderOneJoy(data[1])
+		if err == nil {
+			fmt.Println("Spider one joy err = ", err)
+			continue
+		}
+		fmt.Println("title = ", title)
+		fmt.Println("content = ", content)
 	}
 
 }
