@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	// "os"
 	"strconv"
@@ -54,6 +55,7 @@ func SpiderOneJoy(url string) (title, content string, err error) {
 	tmpTitle := re1.FindAllStringSubmatch(result, 1) //最后参数为1，只过滤第一个
 	for _, data := range tmpTitle {
 		title = data[1]
+		title = strings.Replace(title, "\t", "", -1) //将换行符替换为空字符
 		break
 	}
 
@@ -66,6 +68,9 @@ func SpiderOneJoy(url string) (title, content string, err error) {
 	tmpContent := re2.FindAllStringSubmatch(result, -1)
 	for _, data := range tmpContent {
 		content = data[1]
+		content = strings.Replace(content, "\t", "", -1)
+		content = strings.Replace(content, "\n", "", -1)
+		content = strings.Replace(content, "\r", "", -1)
 		break
 	}
 
@@ -89,6 +94,7 @@ func SpiderPage(i int) {
 	//取，一个段子url的连接
 	//解析表达式
 	re := regexp.MustCompile(`<h1 class="dp-b"><a href="(?s:(.*?)"`)
+	fmt.Println("re = ", re)
 	if re == nil {
 		fmt.Println("regexp compile failed")
 		return
@@ -107,8 +113,8 @@ func SpiderPage(i int) {
 			fmt.Println("Spider one joy err = ", err)
 			continue
 		}
-		fmt.Println("title = ", title)
-		fmt.Println("content = ", content)
+		fmt.Println("title = #%v#", title)
+		fmt.Println("content = #%v#", content)
 	}
 
 }
