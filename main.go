@@ -113,9 +113,9 @@ func SpiderPage(i int, page chan int) {
 	}
 
 	// fmt.Println("r = ", result)
-	//取，一个段子url的连接
+	//取，<h1 class="dp-b"><a href= 一个段子url的连接
 	//解析表达式
-	re := regexp.MustCompile(`<h1 class="dp-b"><a href="(?s:(.*?)"`)
+	re := regexp.MustCompile(`<h1 class="dp-b"><a href="(?s:(.*?))"`)
 	fmt.Println("re = ", re)
 	if re == nil {
 		fmt.Println("regexp compile failed")
